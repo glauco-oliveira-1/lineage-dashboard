@@ -1,0 +1,324 @@
+:root {
+    --bg-color: #0f172a;
+    --sidebar-bg: rgba(30, 41, 59, 0.7);
+    --text-color: #f1f5f9;
+    --accent-color: #38bdf8;
+    --border-color: #334155;
+    --node-source: #10b981;
+    --node-target: #f43f5e;
+    --link-color: rgba(148, 163, 184, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+}
+
+#app {
+    display: flex;
+    height: 100vh;
+}
+
+#sidebar {
+    width: 350px;
+    background-color: var(--sidebar-bg);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    z-index: 10;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+    background: linear-gradient(to right, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header p {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin-bottom: 32px;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+select, input {
+    width: 100%;
+    background-color: #1e293b;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-color);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+select:focus, input:focus {
+    border-color: var(--accent-color);
+}
+
+#details {
+    margin-top: 32px;
+    flex-grow: 1;
+    border-top: 1px solid var(--border-color);
+    padding-top: 24px;
+}
+
+#details h3 {
+    font-size: 1rem;
+    margin-bottom: 16px;
+    color: var(--accent-color);
+}
+
+.placeholder {
+    color: #64748b;
+    font-style: italic;
+    font-size: 0.875rem;
+}
+
+#graph-container {
+    flex-grow: 1;
+    position: relative;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+svg:active {
+    cursor: grabbing;
+}
+
+#controls {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+#reset-zoom {
+    background-color: #1e293b;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+#reset-zoom:hover {
+    background-color: #334155;
+    border-color: var(--accent-color);
+}
+
+.legend {
+    background-color: rgba(30, 41, 59, 0.8);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: #cbd5e1;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.dot.source { background-color: var(--node-source); }
+.dot.target { background-color: var(--node-target); }
+
+/* Node and link styles for SVG */
+.node circle {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.node text {
+    font-size: 10px;
+    fill: #94a3b8;
+    pointer-events: none;
+}
+
+.link {
+    fill: none;
+    stroke: var(--link-color);
+    stroke-opacity: 0.6;
+    transition: stroke-opacity 0.3s, stroke 0.3s;
+}
+
+.link.highlight {
+    stroke: var(--accent-color);
+    stroke-opacity: 1;
+    stroke-width: 2px;
+}
+
+.link.dimmed {
+    stroke-opacity: 0.05;
+}
+
+.node.highlight circle {
+    stroke: var(--accent-color);
+    stroke-width: 3px;
+    fill-opacity: 1;
+}
+
+.node.dimmed circle {
+    fill-opacity: 0.15;
+    stroke-opacity: 0.15;
+}
+
+.node.highlight text {
+    fill: #fff;
+    font-weight: bold;
+    font-size: 12px;
+    opacity: 1 !important;
+}
+
+.node.dimmed text {
+    opacity: 0 !important;
+}
+
+.macro-view .node text {
+    opacity: 0;
+}
+
+.error-box {
+    background-color: rgba(244, 63, 94, 0.1);
+    border: 1px solid var(--node-target);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 20px;
+}
+
+.error-box p {
+    color: var(--text-color);
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+}
+
+.error-box code {
+    display: block;
+    background-color: #000;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 8px 0;
+    font-family: monospace;
+    color: var(--accent-color);
+}
+
+.error-box a {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+/* Detail Panel Styles */
+.detail-item {
+    margin-bottom: 16px;
+}
+
+.detail-item strong {
+    display: block;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.detail-item .value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    word-break: break-all;
+}
+
+.relations {
+    margin-top: 24px;
+}
+
+.relations h4 {
+    font-size: 0.875rem;
+    color: var(--accent-color);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 4px;
+}
+
+.relations ul {
+    list-style: none;
+}
+
+.relations li {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    padding-left: 12px;
+    position: relative;
+}
+
+.relations li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+}
+
+.path-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 8px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.75rem !important;
+}
+
+.path-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.path-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}

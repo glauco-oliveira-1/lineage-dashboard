@@ -1,0 +1,317 @@
+let fullData = null;
+let filteredData = null;
+let simulation = null;
+let svg = null;
+let g = null;
+let zoom = null;
+
+const width = window.innerWidth - 350;
+const height = window.innerHeight;
+
+// Initialize the SVG and zoom behavior
+function init() {
+    svg = d3.select("#lineage-graph")
+        .attr("width", width)
+        .attr("height", height);
+
+    g = svg.append("g");
+
+    zoom = d3.zoom()
+        .scaleExtent([0.05, 8])
+        .on("zoom", (event) => {
+            g.attr("transform", event.transform);
+            
+            // Semantic zoom: hide text if zoom is too small
+            if (event.transform.k < 0.6) {
+                svg.classed("macro-view", true);
+            } else {
+                svg.classed("macro-view", false);
+            }
+        });
+
+    svg.call(zoom);
+
+    svg.on("click", (event) => {
+        if (event.target.tagName === 'svg') {
+            clearDetails();
+        }
+    });
+
+    d3.select("#reset-zoom").on("click", () => {
+        svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+        clearDetails();
+    });
+
+    loadData();
+}
+
+async function loadData() {
+    if (window.location.protocol === 'file:') {
+        document.getElementById('details-content').innerHTML = `
+            <div class="error-box">
+                <p><strong>CORS Error:</strong> Browser security blocks loading data from <code>file://</code>.</p>
+                <p>You MUST run a local server to view this. Run this command in your terminal:</p>
+                <code>python -m http.server 8000</code>
+                <p>Then access: <a href="http://localhost:8000" target="_blank">http://localhost:8000</a></p>
+            </div>
+        `;
+        return;
+    }
+
+    try {
+        const response = await fetch('lineage_data.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        fullData = await response.json();
+        
+        populateFilters();
+        updateGraph();
+        
+        // Setup search
+        d3.select("#search-node").on("input", function() {
+            const term = this.value.toLowerCase();
+            if (term.length < 3) return;
+            
+            const match = fullData.nodes.find(n => n.id.toLowerCase().includes(term));
+            if (match) {
+                focusNode(match.id);
+            }
+        });
+
+        d3.select("#app-filter").on("change", updateGraph);
+        d3.select("#type-filter").on("change", updateGraph);
+
+    } catch (error) {
+        console.error("Error loading data:", error);
+        document.getElementById('details-content').innerHTML = `<p class="error">Error loading data. Make sure lineage_data.json exists.</p>`;
+    }
+}
+
+function populateFilters() {
+    const appFilter = d3.select("#app-filter");
+    fullData.filters.apps.forEach(app => {
+        appFilter.append("option").attr("value", app).text(app);
+    });
+
+    const typeFilter = d3.select("#type-filter");
+    fullData.filters.types.forEach(type => {
+        typeFilter.append("option").attr("value", type).text(type);
+    });
+}
+
+function updateGraph() {
+    const selectedApp = d3.select("#app-filter").property("value");
+    const selectedType = d3.select("#type-filter").property("value");
+
+    // Filter links
+    let links = fullData.links.filter(l => {
+        const appMatch = selectedApp === "all" || l.apps.includes(selectedApp);
+        const typeMatch = selectedType === "all" || l.types.includes(selectedType);
+        return appMatch && typeMatch;
+    });
+
+    // If too many links, limit for performance (can be adjusted)
+    const MAX_LINKS = 2000;
+    if (links.length > MAX_LINKS) {
+        console.warn(`Too many links (${links.length}). Limiting to ${MAX_LINKS} for performance.`);
+        links = links.sort((a, b) => b.weight - a.weight).slice(0, MAX_LINKS);
+    }
+
+    // Get nodes involved in filtered links
+    const nodeIds = new Set();
+    links.forEach(l => {
+        nodeIds.add(l.source);
+        nodeIds.add(l.target);
+    });
+
+    const nodes = fullData.nodes.filter(n => nodeIds.has(n.id));
+
+    render(nodes, links);
+}
+
+function render(nodes, links) {
+    if (simulation) simulation.stop();
+
+    g.selectAll("*").remove();
+
+    // Arrow markers
+    g.append("defs").append("marker")
+        .attr("id", "arrowhead")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 20)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("xoverflow", "visible")
+        .append("svg:path")
+        .attr("d", "M 0,-5 L 10 ,0 L 0,5")
+        .attr("fill", "#94a3b8")
+        .style("stroke", "none");
+
+    simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+        .force("charge", d3.forceManyBody().strength(-400))
+        .force("collide", d3.forceCollide().radius(d => 10 + Math.sqrt(getNodeWeight(d.id, links)) * 3).iterations(2))
+        .force("x", d3.forceX(d => {
+            // Push sources left, targets right
+            if (d.type === 'source') return width * 0.2;
+            if (d.type === 'target') return width * 0.8;
+            return width / 2;
+        }).strength(0.3))
+        .force("y", d3.forceY(height / 2).strength(0.1));
+
+    const link = g.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(links)
+        .enter().append("line")
+        .attr("class", "link")
+        .attr("marker-end", "url(#arrowhead)");
+
+    const node = g.append("g")
+        .attr("class", "nodes")
+        .selectAll("g")
+        .data(nodes)
+        .enter().append("g")
+        .attr("class", "node")
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended))
+        .on("click", (event, d) => showDetails(d));
+
+    node.append("circle")
+        .attr("r", d => 5 + Math.sqrt(getNodeWeight(d.id, links)) * 2)
+        .attr("fill", d => d.type === 'source' ? 'var(--node-source)' : 'var(--node-target)');
+
+    node.append("text")
+        .attr("dx", 12)
+        .attr("dy", ".35em")
+        .text(d => {
+            const parts = d.id.split('\\');
+            return parts[parts.length - 1];
+        });
+
+    simulation.on("tick", () => {
+        link
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+
+        node
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+}
+
+function getNodeWeight(nodeId, links) {
+    return links.filter(l => l.source.id === nodeId || l.target.id === nodeId || l.source === nodeId || l.target === nodeId).length;
+}
+
+function showDetails(node) {
+    const detailsContent = document.getElementById('details-content');
+    
+    // Highlight related
+    d3.selectAll(".link").classed("dimmed", true).classed("highlight", false);
+    d3.selectAll(".node").classed("dimmed", true).classed("highlight", false);
+
+    d3.selectAll(".link")
+        .filter(l => l.source.id === node.id || l.target.id === node.id)
+        .classed("highlight", true)
+        .classed("dimmed", false);
+
+    const relatedLinks = fullData.links.filter(l => l.source === node.id || l.target === node.id);
+    const neighbors = new Set([node.id]);
+    relatedLinks.forEach(l => {
+        neighbors.add(typeof l.source === 'object' ? l.source.id : l.source);
+        neighbors.add(typeof l.target === 'object' ? l.target.id : l.target);
+    });
+
+    d3.selectAll(".node")
+        .filter(n => neighbors.has(n.id))
+        .classed("highlight", true)
+        .classed("dimmed", false);
+    
+    let html = `
+        <div class="detail-item">
+            <strong>Nome Lógico:</strong>
+            <span class="value">${node.id}</span>
+        </div>
+        <div class="detail-item">
+            <strong>Interações:</strong>
+            <span class="value">${relatedLinks.length}</span>
+        </div>
+    `;
+
+    if (node.physical_paths && node.physical_paths.length > 0) {
+        html += `
+            <div class="relations">
+                <h4>Trilha Física (Caminhos Reais):</h4>
+                <ul class="path-list">
+                    ${node.physical_paths.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    html += `
+        <div class="relations">
+            <h4>Conectado com:</h4>
+            <ul>
+    `;
+
+    relatedLinks.slice(0, 10).forEach(l => {
+        const otherId = typeof l.source === 'object' ? (l.source.id === node.id ? l.target.id : l.source.id) : (l.source === node.id ? l.target : l.source);
+        html += `<li>${otherId} (${l.weight}x)</li>`;
+    });
+
+    if (relatedLinks.length > 10) {
+        html += `<li>...e mais ${relatedLinks.length - 10} conexões</li>`;
+    }
+
+    html += `</ul></div>`;
+    detailsContent.innerHTML = html;
+}
+
+function clearDetails() {
+    document.getElementById('details-content').innerHTML = '<p class="placeholder">Select a node to see details</p>';
+    d3.selectAll(".link").classed("highlight", false).classed("dimmed", false);
+    d3.selectAll(".node").classed("highlight", false).classed("dimmed", false);
+}
+
+function focusNode(nodeId) {
+    const node = d3.selectAll(".node").filter(d => d.id === nodeId).datum();
+    if (node) {
+        svg.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity.translate(width / 2, height / 2).scale(2).translate(-node.x, -node.y)
+        );
+        showDetails(node);
+    }
+}
+
+function dragstarted(event) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    event.subject.fx = event.subject.x;
+    event.subject.fy = event.subject.y;
+}
+
+function dragged(event) {
+    event.subject.fx = event.x;
+    event.subject.fy = event.y;
+}
+
+function dragended(event) {
+    if (!event.active) simulation.alphaTarget(0);
+    event.subject.fx = null;
+    event.subject.fy = null;
+}
+
+window.addEventListener('resize', () => {
+    // Basic resize handling
+    const newWidth = window.innerWidth - 350;
+    const newHeight = window.innerHeight;
+    svg.attr("width", newWidth).attr("height", newHeight);
+});
+
+init();
