@@ -1,0 +1,365 @@
+//------------------------------------------------------------
+// AMBIENTE
+//------------------------------------------------------------
+set errormode =0;
+
+Let vMesCarga = Date(Today(),'YYYYMM');
+Let vDataCarga = Date(Today(),'YYYYMMDD');
+Let vMesCargaPRD3 = Date(Today(),'YYYY_MM');
+
+Trace $(vMesCarga);
+Trace $(vMesCargaPRD3);
+Trace $(vDataCarga);
+
+//------------------------------------------------------------
+// 4 - SERVIDOR VIEW (PRD6)
+//------------------------------------------------------------
+TRACE =====================================;
+TRACE EXTRAÇÃO SERVIDOR VIEW PRD6;
+TRACE =====================================;
+TRACE EXTRAÇÃO FILELIST PRD6;
+
+//------------------------------------------------------------
+// SUB DIRETÓRIOS
+//------------------------------------------------------------
+SUB DoDir (Root)
+    FOR EACH Ext IN 'log'
+        FOR EACH File IN FileList(Root & '/*.' & Ext)
+            Base_Arquivos_Temp:
+            LOAD
+                  '$(File)'                                      AS Name
+                , Num(
+                    (FileSize('$(File)') / 1024) / 1024,
+                    '#,##0'
+                  )                                              AS Size
+                , FileTime('$(File)')                            AS FileTime
+            AUTOGENERATE 1;
+        NEXT File
+    NEXT Ext
+
+    FOR EACH Dir IN DirList(Root & '/*')
+        CALL DoDir (Dir)
+    NEXT Dir
+END SUB;
+
+//------------------------------------------------------------
+// EXECUTA VARREDURA
+//------------------------------------------------------------
+CALL DoDir ('lib://Extrator (dpsp_qlikview.user)');
+CALL DoDir ('lib://Aplicativo (dpsp_qlikview.user)');
+
+//------------------------------------------------------------
+// BASE ARQUIVOS
+//------------------------------------------------------------
+Base_Arquivos:
+LOAD
+      *
+    , 1                                                         AS Contador
+RESIDENT Base_Arquivos_Temp
+WHERE WildMatch(Name,'*.qvw.*') > 0;
+
+DROP TABLE Base_Arquivos_Temp;
+
+//------------------------------------------------------------
+// STORE BASE QVW
+//------------------------------------------------------------
+STORE Base_Arquivos INTO [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Base_Name_QVW_v2.qvd] (qvd);
+
+//------------------------------------------------------------
+// 5. IDENTIFICA ÚLTIMO LOG POR APP
+//------------------------------------------------------------
+Temp:
+LOAD
+      SubField(
+            SubField(Name,'/',SubStringCount(Name,'/')+1),
+            '.qvw', 1
+      )                                                         AS Name
+    , Name                                                      AS Name2
+    , FileTime
+    , Num(FileTime) & '|' &
+      SubField(
+            SubField(Name,'/',SubStringCount(Name,'/')+1),
+            '.qvw', 1
+      )                                                         AS link1
+    , SubField(
+            SubField(Name,'/',SubStringCount(Name,'/')+1),
+            '.qvw', 1
+      )                                                         AS link
+FROM [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Base_Name_QVW_v2.qvd] (qvd)
+WHERE Year(FileTime) >= Year(Today());
+
+//------------------------------------------------------------
+// DATA MAIS RECENTE
+//------------------------------------------------------------
+MaxDate:
+LOAD
+      link
+    , Num(Max(FileTime))                                        AS DataMaior
+RESIDENT Temp
+GROUP BY link;
+
+//------------------------------------------------------------
+// JOIN FILTRO
+//------------------------------------------------------------
+LEFT JOIN (Temp)
+LOAD
+      DataMaior & '|' & link                                    AS link1
+    , 'A'                                                       AS Filtro
+RESIDENT MaxDate;
+
+DROP TABLE MaxDate;
+
+//------------------------------------------------------------
+// BASE FINAL APPS
+//------------------------------------------------------------
+Base_Name_Apps:
+LOAD
+      *
+    , 1                                                         AS contador
+RESIDENT Temp
+WHERE Filtro = 'A';
+
+DROP TABLE Temp;
+
+//------------------------------------------------------------
+// 6.LOOP LEITURA LOGS - PRD6
+// Captura:
+//   - Linhas com caminho de arquivo (FROM / STORE / INCLUDE)
+//   - Keywords: STORE, CONNECT, SQL SELECT, LOAD, JOIN, APPLYMAP, IF, FOR, WHILE
+//   - Linhas terminadas em ':' → nome de tabela Qlik (LABEL)
+//------------------------------------------------------------
+LET vNumeroLinhas = NoOfRows('Base_Name_Apps');
+SET ErrorMode = 0;
+
+FOR i = 1 TO $(vNumeroLinhas)
+
+    LET vArquivo = Peek('Name2', $(i)-1, 'Base_Name_Apps');
+
+    TRACE -----------------------------------;
+    TRACE vArquivo = $(i) de $(vNumeroLinhas);
+    TRACE -----------------------------------;
+
+    Base_Logs_PRD6_Temp:
+    LOAD
+          RowNo()                                               AS NroLinha
+        , Hash128(FileName(), RowNo(), "@1:n")                  AS ID_LOG
+        , "@1:n"                                                AS Linhas
+        , Upper(Trim("@1:n"))                                   AS Linha_Normalizada
+        , Trim(FileName())                                      AS Arquivo
+        , TextBetween(
+              '/' & SubField(SubField(FileName(),'/',SubStringCount(FileName(),'/')+1), '.qvw', 1) & '.qvw',
+              '/', '.qvw'
+          )                                                     AS app_id
+        , FileTime()                                            AS DATA
+        , 'PRD6'                                                AS Origem
+        , Upper(Trim(SubField(Replace(Replace(SubField('$(vArquivo)', '.log', 1), 'lib://Extrator (dpsp_qlikview.user)/', 'F:/qlikview/Extrator/'), 'lib://Aplicativo (dpsp_qlikview.user)/', 'F:/qlikview/Aplicativo/'), '.qvw', 1) & '.qvw')) AS Trilha_Arquivo
+    FROM ['$(vArquivo)'] (fix, utf8, no labels)
+    WHERE
+        SubStringCount(Replace([@1:n], '/', '\\'), '\\') > 0
+        OR WildMatch(Upper("@1:n"),
+            '*STORE*INTO*', '*CONNECT*', '*SQL*SELECT*', '*SELECT*FROM*', '*LOAD*FROM*', '*LOAD*INLINE*', '*RESIDENT*', '*INCLUDE=*',
+            '*JOIN*', '*APPLYMAP*', '*IF*', '*FOR*', '*WHILE*', '*CONCATENATE*', '*NOCONCATENATE*', '*MAPPING*', '*SQL *', '*FROM *'
+        ) > 0
+        OR (Right(Trim("@1:n"), 1) = ':' AND Left(Trim("@1:n"), 2) <> '//' AND Len(Trim(Replace("@1:n", ':', ''))) > 0
+            AND NOT WildMatch(Upper(Trim("@1:n")), 'TRACE*', 'SET *', 'LET *', 'NEXT*', 'THEN*', 'ELSE*', 'END *', 'SUB *', 'CALL *', 'EXIT*', 'WHEN*', 'UNLESS*', 'SWITCH*', 'CASE*', 'DEFAULT*') > 0);
+
+NEXT i;
+
+SET ErrorMode = 1;
+DROP TABLE Base_Name_Apps;
+
+//------------------------------------------------------------
+// 7. CLASSIFICAÇÃO E TRACKING DE TABELA ATIVA
+//------------------------------------------------------------
+Base_Logs_PRD6_TMP2:
+LOAD
+      *
+    , If(WildMatch(Linha_Normalizada,'*STORE*INTO*')>0,         'STORE',
+      If(WildMatch(Linha_Normalizada,'*SQL*SELECT*','*SELECT*FROM*','*SQL *')>0, 'BANCO',
+      If(WildMatch(Linha_Normalizada,'*LOAD*INLINE*')>0,        'INLINE',
+      If(WildMatch(Linha_Normalizada,'*RESIDENT*')>0,           'RESIDENT',
+      If(WildMatch(Linha_Normalizada,'*INCLUDE=*')>0,           'INCLUDE',
+      If(WildMatch(Linha_Normalizada,'*CONNECT*')>0,             'CONEXAO',
+      If(WildMatch(Linha_Normalizada,'*JOIN*')>0,               'JOIN',
+      If(WildMatch(Linha_Normalizada,'*APPLYMAP*')>0,           'APPLYMAP',
+      If(WildMatch(Linha_Normalizada,'*IF*')>0,                 'IF',
+      If(WildMatch(Linha_Normalizada,'*FOR*')>0,                'FOR',
+      If(WildMatch(Linha_Normalizada,'*WHILE*')>0,              'WHILE',
+      If(WildMatch(Linha_Normalizada,'*MAPPING*')>0,            'MAPPING',
+      If(WildMatch(Linha_Normalizada,'*FROM*')>0,
+         If(WildMatch(Linha_Normalizada,'*.XLS*')>0,            'EXCEL',
+         If(WildMatch(Linha_Normalizada,'*.CSV*')>0,            'CSV',
+         If(WildMatch(Linha_Normalizada,'*.TXT*')>0,            'TXT',
+         If(WildMatch(Linha_Normalizada,'*.QVD*')>0,            'QVD',
+         If(SubStringCount(Replace(Linha_Normalizada,'\\','/'),'/')=0, 'BANCO', 'ARQUIVO'))))),
+      If(Right(Trim(Linha_Normalizada), 1) = ':',               'LABEL',
+      'OUTROS'))))))))))))))                                    AS Tipo_Operacao
+    
+    // Extração de Trilha (Caminho ou Tabela)
+    , If(WildMatch(Linha_Normalizada,'*FROM*')>0,
+         If(WildMatch(Linha_Normalizada, '*FROM*[*]*')>0,
+            TextBetween(Linha_Normalizada,'[',']'),
+            Trim(SubField(Trim(SubField(Linha_Normalizada,'FROM',2)),' ',1))),
+      If(WildMatch(Linha_Normalizada,'*INTO*')>0,
+         If(Len(Trim(TextBetween(Linha_Normalizada,'[',']')))>0, TextBetween(Linha_Normalizada,'[',']'), Trim(SubField(Linha_Normalizada,'INTO',2))),
+      If(WildMatch(Linha_Normalizada,'*RESIDENT*')>0,
+         If(WildMatch(Linha_Normalizada,'*RESIDENT*[*]*')>0, TextBetween(Linha_Normalizada,'[',']'), Trim(SubField(Trim(SubField(Linha_Normalizada,'RESIDENT ',2)),' ',1))),
+      If(WildMatch(Linha_Normalizada,'*INCLUDE=*')>0, TextBetween(Linha_Normalizada,'INCLUDE=',')'),
+      If(WildMatch(Linha_Normalizada,'*CONNECT*')>0, Trim(SubField(Linha_Normalizada,' TO ',2)),
+      If(Right(Trim(Linha_Normalizada),1)=':', Trim(Left(Trim(Mid(Trim(Linhas), Index(Trim(Linhas),' ',2)+1)), Len(Trim(Mid(Trim(Linhas), Index(Trim(Linhas),' ',2)+1)))-1)),
+      Null()))))))                                               AS Trilha
+RESIDENT Base_Logs_PRD6_Temp
+ORDER BY Arquivo, NroLinha;
+
+DROP TABLE Base_Logs_PRD6_Temp;
+
+//------------------------------------------------------------
+// 8. DETERMINAÇÃO DA TABELA DE MEMÓRIA (TRACKING) E FONTE STORE
+//------------------------------------------------------------
+Base_Logs_PRD6:
+LOAD
+      *
+    // Identifica a tabela sendo salva no STORE
+    , If(Tipo_Operacao = 'STORE', 
+        Upper(Trim(SubField(Trim(SubField(Linha_Normalizada,'STORE ',2)),' INTO',1))), 
+        Null())                                                 AS Tabela_Fonte_STORE
+
+    // Lógica de Tabela Ativa: persiste o LABEL anterior no mesmo arquivo
+    , If(Arquivo <> Peek('Arquivo'),
+        If(Tipo_Operacao = 'LABEL', Trilha, 'TABELA_SEM_NOME'),
+        If(Tipo_Operacao = 'LABEL', Trilha, Peek('Tabela_Memoria'))
+      )                                                         AS Tabela_Memoria
+RESIDENT Base_Logs_PRD6_TMP2
+ORDER BY Arquivo, NroLinha;
+
+DROP TABLE Base_Logs_PRD6_TMP2;
+
+//------------------------------------------------------------
+// 9. STORE LOGS DETALHADOS (Para o App)
+//------------------------------------------------------------
+STORE Base_Logs_PRD6 INTO [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Lineage_Detalhado.qvd] (qvd);
+
+//------------------------------------------------------------
+// 10. TABELA DE CONTADORES (REQUISITO USUÁRIO)
+//------------------------------------------------------------
+Contadores_Script:
+LOAD
+      app_id
+    , Count(If(WildMatch(Tipo_Operacao, 'QVD', 'CSV', 'TXT', 'EXCEL', 'BANCO', 'INLINE'), 1)) AS Qtd_Loads
+    , Count(If(Tipo_Operacao = 'STORE', 1))                     AS Qtd_Stores
+    , Count(If(Tipo_Operacao = 'JOIN', 1))                      AS Qtd_Joins
+    , Count(If(Tipo_Operacao = 'APPLYMAP', 1))                  AS Qtd_ApplyMaps
+    , Count(If(Tipo_Operacao = 'RESIDENT', 1))                  AS Qtd_Residents
+    , Count(If(Tipo_Operacao = 'IF', 1))                        AS Qtd_Ifs
+    , Count(If(Tipo_Operacao = 'FOR', 1))                       AS Qtd_Fors
+    , Count(If(Tipo_Operacao = 'WHILE', 1))                     AS Qtd_Whiles
+RESIDENT Base_Logs_PRD6
+GROUP BY app_id;
+
+STORE Contadores_Script INTO [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Contadores_Script.qvd] (qvd);
+
+//------------------------------------------------------------
+// 11. ESTRUTURA PARA GRAFO (ORIGEM -> DESTINO)
+//------------------------------------------------------------
+Lineage_Graph_Edges_Temp:
+// 1. Origem -> Memória (Entrada)
+LOAD
+      app_id                                                    AS Aplicativo
+    , NroLinha                                                  AS Sequencia
+    , Upper(Trilha)                                             AS Origem_Fisica
+    , Upper(Tabela_Memoria)                                     AS Destino_Fisico
+    , Tipo_Operacao                                             AS Tipo_Operação
+    , 'ENTRADA'                                                 AS Fluxo
+    , DATA                                                      AS Data_Hora
+RESIDENT Base_Logs_PRD6
+WHERE Match(Tipo_Operacao, 'QVD', 'CSV', 'TXT', 'EXCEL', 'BANCO', 'INLINE') // , 'RESIDENT' -> REMOVIDO PARA TESTE
+  AND Upper(Trilha) <> Upper(Tabela_Memoria);
+
+// 2. Memória -> Destino (Saída)
+CONCATENATE (Lineage_Graph_Edges_Temp)
+LOAD
+      app_id                                                    AS Aplicativo
+    , NroLinha                                                  AS Sequencia
+    , Upper(If(Len(Trim(Tabela_Fonte_STORE))>0, Tabela_Fonte_STORE, Tabela_Memoria)) AS Origem_Fisica
+    , Upper(Trilha)                                             AS Destino_Fisico
+    , 'STORE'                                                   AS Tipo_Operação
+    , 'SAÍDA'                                                   AS Fluxo
+    , DATA                                                      AS Data_Hora
+RESIDENT Base_Logs_PRD6
+WHERE Tipo_Operacao = 'STORE';
+
+//------------------------------------------------------------
+// 12. NORMALIZAÇÃO DE NOMES E LIMPEZA FINAL
+//------------------------------------------------------------
+Lineage_Graph_Edges:
+LOAD
+      Aplicativo
+    , Sequencia
+    , Tipo_Operação
+    , Fluxo
+    , Data_Hora
+    , Origem_Fisica
+    , Destino_Fisico
+    
+    // Normalização final: Remover sufixo numérico de 8 dígitos (" - YYYYMMDD") e " - DATA"
+    , If(Origem_Parcial Like '* - ????????' and IsNum(Right(Origem_Parcial, 8)), Trim(Left(Origem_Parcial, Len(Origem_Parcial) - 11)),
+      If(Origem_Parcial Like '* - DATA', Trim(Left(Origem_Parcial, Len(Origem_Parcial) - 7)), Origem_Parcial)) AS Origem
+
+    , If(Destino_Parcial Like '* - ????????' and IsNum(Right(Destino_Parcial, 8)), Trim(Left(Destino_Parcial, Len(Destino_Parcial) - 11)),
+      If(Destino_Parcial Like '* - DATA', Trim(Left(Destino_Parcial, Len(Destino_Parcial) - 7)), Destino_Parcial)) AS Destino
+;
+LOAD
+      Aplicativo
+    , Sequencia
+    , Tipo_Operação
+    , Fluxo
+    , Data_Hora
+    , Origem_Fisica
+    , Destino_Fisico
+    
+    // Lógica de Nome Lógico (Origem)
+    , If(SubStringCount(Origem_Fisica, '/') > 0 or SubStringCount(Origem_Fisica, '\') > 0,
+        // É um caminho: Extrai apenas o nome limpo (Sem extensão)
+        If(Len(KeepChar(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '_', 1), '0123456789')) > 0 or Left(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), 2) = Chr(36) & '(',
+            Mid(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1), Index(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1), '_') + 1), // Remove Prefixo
+            If(Len(KeepChar(SubField(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1), '_', -1), '0123456789')) > 0 or Left(SubField(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1), '_', -1), 2) = Chr(36) & '(',
+               Left(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1), Len(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1)) - Len(SubField(SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1), '_', -1)) - 1), // Remove Sufixo
+               SubField(SubField(Replace(Origem_Fisica, '/', '\'), '\', -1), '.', 1))
+        ),
+        // Não é caminho: Limpa a string diretamente
+        If(Len(KeepChar(SubField(Origem_Fisica, '_', 1), '0123456789')) > 0 or Left(Origem_Fisica, 2) = Chr(36) & '(',
+            Mid(SubField(Origem_Fisica, '.', 1), Index(SubField(Origem_Fisica, '.', 1), '_') + 1),
+            If(Len(KeepChar(SubField(SubField(Origem_Fisica, '.', 1), '_', -1), '0123456789')) > 0 or Left(SubField(SubField(Origem_Fisica, '.', 1), '_', -1), 2) = Chr(36) & '(',
+               Left(SubField(Origem_Fisica, '.', 1), Len(SubField(Origem_Fisica, '.', 1)) - Len(SubField(SubField(Origem_Fisica, '.', 1), '_', -1)) - 1),
+               SubField(Origem_Fisica, '.', 1)))
+      )                                                         AS Origem_Parcial
+
+    // Lógica de Nome Lógico (Destino)
+    , If(SubStringCount(Destino_Fisico, '/') > 0 or SubStringCount(Destino_Fisico, '\') > 0,
+        // É um caminho: Extrai apenas o nome limpo (Sem extensão)
+        If(Len(KeepChar(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '_', 1), '0123456789')) > 0 or Left(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), 2) = Chr(36) & '(',
+            Mid(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1), Index(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1), '_') + 1), // Remove Prefixo
+            If(Len(KeepChar(SubField(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1), '_', -1), '0123456789')) > 0 or Left(SubField(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1), '_', -1), 2) = Chr(36) & '(',
+               Left(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1), Len(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1)) - Len(SubField(SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1), '_', -1)) - 1), // Remove Sufixo
+               SubField(SubField(Replace(Destino_Fisico, '/', '\'), '\', -1), '.', 1))
+        ),
+        // Não é caminho: Limpa a string diretamente
+        If(Len(KeepChar(SubField(Destino_Fisico, '_', 1), '0123456789')) > 0 or Left(Destino_Fisico, 2) = Chr(36) & '(',
+            Mid(SubField(Destino_Fisico, '.', 1), Index(SubField(Destino_Fisico, '.', 1), '_') + 1),
+            If(Len(KeepChar(SubField(SubField(Destino_Fisico, '.', 1), '_', -1), '0123456789')) > 0 or Left(SubField(SubField(Destino_Fisico, '.', 1), '_', -1), 2) = Chr(36) & '(',
+               Left(SubField(Destino_Fisico, '.', 1), Len(SubField(Destino_Fisico, '.', 1)) - Len(SubField(SubField(Destino_Fisico, '.', 1), '_', -1)) - 1),
+               SubField(Destino_Fisico, '.', 1)))
+      )                                                         AS Destino_Parcial
+RESIDENT Lineage_Graph_Edges_Temp;
+
+DROP TABLE Lineage_Graph_Edges_Temp;
+
+STORE Lineage_Graph_Edges INTO [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Lineage_Graph_Edges.qvd] (qvd);
+
+//------------------------------------------------------------
+// CLEANUP FINAL
+//------------------------------------------------------------
+DROP TABLE Base_Logs_PRD6;
+DROP TABLE Contadores_Script;
+DROP TABLE Lineage_Graph_Edges;
+DROP TABLE Base_Arquivos;

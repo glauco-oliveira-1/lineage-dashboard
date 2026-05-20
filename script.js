@@ -102,6 +102,12 @@ function updateGraph() {
     const selectedApp = d3.select("#app-filter").property("value");
     const selectedType = d3.select("#type-filter").property("value");
 
+    if (selectedApp !== "all") {
+        showAppStats(selectedApp);
+    } else {
+        clearDetails();
+    }
+
     // Filter links
     let links = fullData.links.filter(l => {
         const appMatch = selectedApp === "all" || l.apps.includes(selectedApp);
@@ -273,8 +279,37 @@ function showDetails(node) {
     detailsContent.innerHTML = html;
 }
 
+function showAppStats(appName) {
+    const detailsContent = document.getElementById('details-content');
+    const stats = fullData.app_stats && fullData.app_stats[appName];
+    
+    let html = `
+        <div class="detail-item">
+            <strong>Aplicativo:</strong>
+            <span class="value">${appName}</span>
+        </div>
+    `;
+
+    if (stats) {
+        html += `<div class="relations"><h4>Métricas do Script</h4><ul class="stats-list">`;
+        for (const [key, value] of Object.entries(stats)) {
+            html += `<li><strong>${key.replace('Qtd_', '')}:</strong> ${value}</li>`;
+        }
+        html += `</ul></div>`;
+    } else {
+        html += `<p class="placeholder">Sem métricas adicionais para este aplicativo.</p>`;
+    }
+    
+    detailsContent.innerHTML = html;
+}
+
 function clearDetails() {
-    document.getElementById('details-content').innerHTML = '<p class="placeholder">Select a node to see details</p>';
+    const selectedApp = d3.select("#app-filter").property("value");
+    if (selectedApp && selectedApp !== "all") {
+        showAppStats(selectedApp);
+    } else {
+        document.getElementById('details-content').innerHTML = '<p class="placeholder">Select a node to see details</p>';
+    }
     d3.selectAll(".link").classed("highlight", false).classed("dimmed", false);
     d3.selectAll(".node").classed("highlight", false).classed("dimmed", false);
 }

@@ -1,0 +1,46 @@
+//------------------------------------------------------------
+// 1. LINEAGE DETALHADO (FATO PRINCIPAL)
+//------------------------------------------------------------
+Lineage_Detalhado:
+LOAD
+      app_id                                                    AS App_ID
+    , NroLinha
+    , DATA
+    , Tipo_Operacao
+    , Trilha
+    , Tabela_Memoria
+    , Linhas
+    , Arquivo
+    , Trilha_Arquivo
+FROM [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Lineage_Detalhado.qvd] (qvd)
+WHERE Tipo_Operacao <> 'OUTROS';
+
+//------------------------------------------------------------
+// 2. CONTADORES DE SCRIPT
+//------------------------------------------------------------
+Contadores_Script:
+LOAD
+      app_id                                                    AS App_ID
+    , Qtd_Loads
+    , Qtd_Stores
+    , Qtd_Joins
+    , Qtd_ApplyMaps
+    , Qtd_Residents
+    , Qtd_Ifs
+    , Qtd_Fors
+    , Qtd_Whiles
+FROM [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Contadores_Script.qvd] (qvd);
+
+//------------------------------------------------------------
+// 3. ESTRUTURA PARA GRAFO (ORIGEM -> DESTINO)
+//------------------------------------------------------------
+Lineage_Graph_Edges:
+LOAD
+      Aplicativo                                                AS App_ID
+    , Sequencia
+    , Origem
+    , Destino
+    , Tipo_Operação
+    , Fluxo
+    , Data_Hora
+FROM [lib://Extrator (dpsp_qlikview.user)/Extrator_Lineage/Extracao/Lineage_Graph_Edges.qvd] (qvd);

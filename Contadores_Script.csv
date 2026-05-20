@@ -1,0 +1,400 @@
+﻿app_id;Qtd_Loads;Qtd_Stores;Qtd_Joins;Qtd_ApplyMaps;Qtd_Residents;Qtd_Ifs;Qtd_Fors;Qtd_Whiles
+01. RATEIO;76;7;116;0;60;98;59;0
+01.Extrator_Diarização - por canal;27;50;158;85;147;210;19;0
+1.Sintetiza_Mudança_Expansão;1;2;10;0;12;7;12;1
+2- Transformador Gera Vendas;98;28;140;0;70;240;24;1
+02. EXTRATOR_ACORDO_GCP;3;10;0;0;1;1;10;0
+02.Extrator_Diarização_Loja;27;51;158;75;147;212;19;0
+3- Extrator apuracao contratos App;31;44;12;0;32;18;46;4
+03. Extrator_Diarização_ajustemeta_Gustavo;0;3;8;5;11;11;12;0
+03. Extrator_Diarização_ajustemeta;0;3;12;7;11;11;12;0
+4- Extrator apuracao contratos Pack Ecom;203;56;168;14;182;471;346;15
+04.Classificacao_Meta;4;669;1456;0;1377;2227;658;21
+5- Extrator apuracao contratos Rebaixa Ecom;203;56;168;14;182;471;346;15
+6- Extrator apuracao contratos Pack Loja;43;57;282;0;1625;12281;1448;1
+7- Extrator apuracao contratos Rebaixa Loja;43;43;30;0;4517;37388;4529;1
+8- Extrator Fixo;5;2;24;0;936;4013;924;0
+14. AJUSTE_INVENTARIO;254;7;10;0;7;4;10;1
+17 AJUSTES_FISCAIS;16;5;20;0;17;1;10;0
+18. OUTROS_AJUSTES;7;4;8;0;15;8;14;0
+19. BAIXA_POR_ERRO;1;1;0;0;0;2;10;0
+20. DESCONTO;3;3;6;0;12;1;13;0
+23. INTEGRADOR_DIM_VENDA;10;5;34;0;4;62;17;2
+Analise Etiquetas;6;1;4;0;2;7;23;0
+Analise_Inventario;1497;0;2;0;3;4668;31;2
+Analise_Produtividade;4663;0;4;0;5;7;10;1
+Aplicativo Cluster Pop_v2;7;0;0;0;0;2;10;0
+Apuracao Contrato Diaria;3;0;2;0;1;615;160;5
+Apuracao Venda Pack_v2;3;0;2;0;1;229;13;5
+Armazenamento;106;2;25;2;23;145;22;2
+Arvore;18;1;6;0;2;23;23;0
+Atributo_Item;29;0;78;0;34;1485;287551;0
+Auditar_Estoque;62;3;14;1;9;296;43;0
+Base_RDF_TXT;0;0;0;0;0;1;10;0
+Black_Friday - Fechamento;77;1;20;0;6;276;23;1
+Brigada de validade;79;1;10;0;10;167;11;0
+Caderno_DRE_NovaVersao;36;0;12;8;23;40;44;0
+Caderno_DRE;0;0;4;0;8;9;161;1
+Cockpit - Compras_DPSP - Copy;741;9;108;2;85;324;634;4
+Cockpit - Compras_DPSP;846;10;120;2;89;326;658;4
+Cockpit_Nprinting;229;1;18;1;76;236;14;0
+ComposicaoCaixa;325;0;0;0;110;764;10;1
+Consulta_Balcao;82;0;0;0;1;7;25;1
+Consulta_Cartoes;329;5;0;0;6;488;105;0
+Coordernação_Farmacêutica;2;0;10;0;8;8;11;0
+CRM_TRANSAÇÃO_v2.QVW.log;73;9;86;0;47;33;113;2
+DataHub vs Transaction - Copy (2);0;0;0;0;0;1;10;0
+DataHub vs Transaction;4957;222;4644;0;2211;938;154;2
+Envio Fornecedor;1;1;0;0;0;1;20;0
+Envio_Boletim_Margem;0;1;16;0;35;127;10;0
+Envio_Itens_PBM_CLOUD;1;1;0;0;0;1;10;1
+Extr_Transformador_Flash_Venda_24;1;3;8;1;6;5;11;0
+Extr_Transformador_Flash_Vendas Hora;1;4;8;1;5;5;12;0
+Extracao_Emin;4301;3;0;0;0;1;11;0
+Extracao_Financeiro;0;0;0;0;0;1;10;0
+Extracao_Separacao;2;1;0;0;0;1;10;0
+Extrator - Atualizacao em massa - Demandas_V3;1;0;0;0;0;7;10;0
+Extrator apuracao contratos App;57;31;12;0;114;144;49;4
+Extrator apuracao contratos Pack Ecom;104;4;110;1;2545;106;67;2
+Extrator apuracao contratos Pack Loja_v3;81;21;24;0;1264;5402;721;2
+Extrator apuracao contratos Rebaixa Ecom New;256;4;262;1;5131;258;143;2
+Extrator apuracao contratos Rebaixa Loja;94;20;8;0;3769;8983;1178;2
+Extrator Cria_Margem_Aggr_MES_YTD;2;6;8;0;6;9;27;0
+Extrator Cria_Margem_Aggr_MES;1;3;4;0;2;5;16;0
+Extrator CRM - Campanhas CRM v2.1;10;2;2;0;0;23;14;0
+Extrator CRM - Filipetas;10;7;0;2;0;9;14;0
+Extrator CRM - Mídias Digitais;2;2;2;0;2;8;17;0
+Extrator CRM - Ticket Médio Nível 2;70;2;14;0;2;1;11;0
+Extrator Pack Virtual;1;0;0;0;0;1;10;0
+Extrator Relação de Lojas;19;15;34;0;7;49;30;0
+Extrator Self Cupons;49;45;180;150;90;346;56;0
+Extrator Tabloide;2;0;0;1;2;1;12;0
+Extrator Venda Promoção;86;24;12;0;12;676;17;2
+Extrator_Agenda;0;2;0;0;0;3;13;0
+Extrator_Ajuste_Inventario;28;1;84;0;43;14;13;0
+Extrator_Armazenamento_Pendente;81;5;8;0;7;43;34;1
+Extrator_Arvore;43;12;22;0;17;38;10;0
+Extrator_Atributo_Item_Loja;4231;7;10;0;8;3;4274;0
+Extrator_Atributo_Item;134;64;136;2;31;43;61;0
+Extrator_Atributo_Loja;62;32;82;2;34;689;49;0
+Extrator_BaseTransacao_Auditoria;36;1;2;0;1;3;10;1
+Extrator_BaseTransacaoDev_Auditoria;41;1;4;0;1;2;10;1
+Extrator_BloqueioCD;14;6;12;0;10;9;10;0
+Extrator_BO_Nota_Fiscal;20;19;0;0;0;1;10;1
+Extrator_Boletim_Comercial - Copy;8;9;46;0;116;164;22;0
+Extrator_Boletim_Comercial - Ecomm - Copy;6;1;16;0;84;348;10;1
+Extrator_Boletim_Comercial - Ecomm;6;1;16;0;84;472;10;1
+Extrator_Boletim_Comercial_2;8;9;46;0;117;166;22;0
+Extrator_Boletim_Comercial;8;9;46;0;117;166;22;0
+Extrator_Brigada;53;4;2;0;4;36;12;2
+Extrator_Bu_Items_Inv_Contingencia;1;2;0;0;0;2;12;0
+Extrator_Calculo_Previsao;2100;2;0;0;0;2;11;0
+Extrator_Cartao_a_Receber;17;1;0;0;0;1;11;0
+Extrator_Categoria_Comprador;15;2;13;0;6;12;10;0
+Extrator_Categorização N2;0;11;18;9;21;4;10;1
+Extrator_Categorização_Meta_Ecomm_Gustavo;0;0;0;0;0;1;13;0
+Extrator_Categorização_Meta_Ecomm;0;5;24;3;19;66;27;0
+Extrator_Categorização_Meta_Hora;2;3;16;1;17;11;10;0
+Extrator_Categorização_Meta_Mes - Copy;1;11;56;0;38;66;95;2
+Extrator_Categorização_Meta_Mes;1;11;56;0;38;66;69;2
+Extrator_Cliente _New;2;2;0;0;4;19;10;0
+Extrator_Cliente;1;1;0;0;0;2;10;0
+Extrator_CloseUP_Sftp;4;4;0;0;1;1;13;1
+Extrator_CM_PERPAVG_COST_v2_Reprossar;151;125;150;0;250;27;10;1
+Extrator_CM_PERPAVG_COST_v2;26;6;6;0;10;3;10;1
+Extrator_Cockpit_Venda;0;3;0;0;2;1;15;0
+Extrator_Coletor_Dados;9464;169;16;0;61;26;16;1
+Extrator_Compras;178;46;58;0;36;9;688;2
+Extrator_Consulta_Balcao;4;1;4;0;5;5;11;0
+Extrator_Contratos;0;4;7;0;5;2512;16;1
+Extrator_Cota;3;2;0;0;2;5;11;0
+Extrator_Cria_Margem_FP;57;6;20;0;8;270;12;0
+Extrator_Cria_Margem_new;246;15;262;0;141;535;11;6
+Extrator_Cria_Margem;51;6;98;0;53;201;11;3
+Extrator_Cross;2;2;0;0;0;2;10;0
+Extrator_CSI_CARTEIRA_DIGITAL - Pix_Ecomm;16;30;15;0;30;1;239;0
+Extrator_CSI_CARTEIRA_DIGITAL_New;1;30;0;0;15;31;161;0
+Extrator_CSI_CARTEIRA_DIGITAL;76;45;60;0;45;61;161;2
+Extrator_CSI_CARTOES;5;6;0;0;2;3;24;0
+Extrator_CSI_Convenio;71;37;60;0;33;1;10;1
+Extrator_CSI_Delivery_Ecommerce;19;1;0;0;0;20;11;0
+Extrator_CSI_FORMA_PAGAMENTO_Atual;2;1;0;0;0;3;11;1
+Extrator_CSI_FORMA_PAGAMENTO;6;5;0;0;0;11;15;1
+Extrator_CSI_GERAL ME - Copy;1078;282;634;0;152;3327;471;30
+Extrator_CSI_GERAL ME;121;21;25;0;7;440;36;1
+Extrator_CSI_GERAL_Agregacao_App_Meu_Viva_Saude;0;1;0;0;0;1;13;0
+Extrator_CSI_GERAL_Dia_Anterior_Agregacao_App_Meu_Viva_Saude;0;1;0;0;0;1;13;0
+Extrator_CSI_GERAL_Dia_Anterior;100;23;23;0;7;433;28;1
+Extrator_CSI_GERAL_Dia_Atual;31;7;19;0;7;89;21;1
+Extrator_CSI_GERAL;567;145;251;0;67;1530;209;13
+Extrator_CSI_PBM;4;3;0;0;0;4;10;1
+Extrator_CSI_POS;5;2;4;0;3;7;18;1
+Extrator_CSI_Preco_Incremental;5;3;8;0;9;14;11;1
+Extrator_CSI_Tratamento;102;10;10;0;7;53;11;0
+Extrator_CSV;14;28;4;0;0;21;36;0
+extrator_cupom_conversao;2152;3;4300;0;2150;2152;12;0
+Extrator_custo_GCP;28;28;0;0;0;1;10;1
+Extrator_Dados_Compras;80;4;6;0;3;30;172;1
+Extrator_Daily;484;10;12;17;20;24;37;0
+Extrator_Datahub_x_Transaction;108830;25;300;0;235;133;31;1
+Extrator_DATAHUB;2;2;0;0;0;1;10;0
+Extrator_Descontos - Copy;23;19;28;0;22;14;67;0
+Extrator_Descontos_concedidos;9;0;7;0;4;21;13;0
+Extrator_Descontos;8;7;18;0;24;13;56;0
+Extrator_DEVOL_LOJA_CD_TRANSITO;3;1;0;0;0;1;10;0
+Extrator_Devolucao_Recebimento;4;4;2;0;1;58;110;3
+Extrator_Dias_Uteis_Lojas;9;4;0;0;2;6;11;0
+Extrator_DIM_ESTOQUE;1689;3;36;0;15;17;11;0
+Extrator_Dim_Venda ME - Copy;12;2;20;0;13;106;13;0
+Extrator_Dim_Venda ME;129;28;254;0;182;1458;26;0
+Extrator_Dim_Venda_Atual;7;3;10;0;10;105;10;0
+Extrator_Dim_Venda_Dia_anterior;70;10;38;0;30;335;12;2
+Extrator_Dim_Venda_Gustavo;123;12;218;0;156;1322;24;0
+Extrator_Dim_Venda_Nova_Margem;283;28;506;0;364;2802;40;0
+Extrator_Dim_Venda- GUSTAVO;0;0;0;0;0;1;10;0
+Extrator_Dim_Venda;151;29;236;0;171;1487;25;0
+Extrator_Ecommerce_Delivery;27;12;102;0;3;5;24;0
+Extrator_Entrada_Recebimento_NF;100;2;8;0;8;31;167;1
+Extrator_Entradas_Sistema;3;1;0;0;0;4;12;0
+Extrator_Entradas;3;1;0;0;0;4;12;0
+Extrator_Estatistica_Separacao;5;3;2;0;2;67;12;0
+Extrator_Estorno_MCD;61;60;0;0;0;1;11;0
+Extrator_Estorno_PDV;51;50;0;0;0;1;11;0
+Extrator_Estrategia_de_Ocupacao;0;2;10;0;0;1;10;0
+Extrator_Excesso;0;0;0;0;0;1;10;0
+Extrator_Falta_CD;9;8;0;0;0;1;10;0
+Extrator_Falta_Fornecedor;7;6;8;0;4;9;45;0
+Extrator_FALTAS;3;1;0;0;0;1;10;0
+Extrator_Falteiro_Drogão;63;35;56;0;0;29;108;1
+Extrator_Falteiro;26;2;30;0;8;9;29;0
+Extrator_Faturamento_DT_CONFIRMACAO_ATUAL;7;4;8;0;3;4;11;1
+Extrator_Faturamento_DT_CONFIRMACAO;103;86;32;0;13;16;26;7
+Extrator_Faturamento_DT_CRIACAO;2;1;0;0;0;1;10;0
+Extrator_Flash_Vendas Hora_24;6;2;8;2;4;16;11;0
+Extrator_Flash_Vendas_DIA;3;0;8;2;3;9;11;0
+Extrator_Flash_Vendas_Minuto;1;0;6;0;2;2;11;0
+Extrator_Fornecedor;11;7;8;0;0;1;90;0
+Extrator_Geracao_Nao_Vendaveis;156;8;56;5;21;35;23;0
+Extrator_ID_TROCAS;5882;51;0;0;0;1;1727;0
+Extrator_Iminencia_CD;0;2;0;38;1;4;12;0
+Extrator_IN_DEMAND_ROMANEIO;0;0;0;0;0;1;10;0
+Extrator_IN_DEMAND;6;5;0;0;4;2;14;0
+Extrator_Indicador_Desempenho;2;1;0;0;0;3;14;0
+Extrator_Integracao_IQVIA_Reproc_Compras;147;175;70;0;77;92;80;1
+Extrator_Integracao_IQVIA;58;56;40;0;38;37;54;0
+Extrator_Integracao_Nestle;3;2;18;0;39;77;87;5
+Extrator_Integracao_PG;2;2;10;0;2;2;12;1
+Extrator_Inventario_Ciclico_V2;6;4;15;0;8;40;11;0
+Extrator_Inventario_Ciclico;23;7;2;0;6;54;12;1
+Extrator_Inventario_Venda_Novo - Ajuste_Chamados;6;4;6;0;3;13;17;0
+Extrator_Inventario_Venda_Novo - Ajuste;40;24;36;0;22;87;24;0
+Extrator_Inventario_Venda_Novo;3436;396;394;423;912;572;26;2
+Extrator_Item_CD_Previsao;3;17;0;0;1;2;164;0
+Extrator_Item_Fornec_Regiao;6;7;0;0;2;1;143;0
+Extrator_Item_Loja_Curva_Bu_Item_Temporaria;0;0;0;0;0;2;10;0
+Extrator_Item_Loja_Curva_Bu_Item;8403;2101;12600;0;6300;14702;11;0
+Extrator_Item_Loja_Dias_Estoque;3;2;0;0;1;50;12;0
+Extrator_Item_Loja_Estoque_Padrao;4203;2101;0;0;0;2;11;0
+Extrator_Item_Loja_Previsao_Rdf_Semanal;3;2099;0;0;2;2;12593;1
+Extrator_Item_Loja_Previsao;3374;1683;3368;0;1677;11;3371;0
+Extrator_Item_Loja_Tratamento;14703;4201;21000;0;2100;26873;12184;0
+Extrator_Item_Promocional;22;2;4;0;4;4;10;0
+Extrator_Itens_PBM;3;1;0;0;1;1;10;0
+Extrator_Lista_Arquivos;0;0;0;0;0;1;10;0
+Extrator_Lista_CRM_Item_LojaBase;11;6;8;0;4;4;10;0
+Extrator_Lista_Item_LojaBase;4;3;0;0;0;1;10;0
+Extrator_Lote_PDV;3;1;0;0;0;1;10;0
+Extrator_Mapa_Controle_AGUA_SAP;0;0;0;0;0;1;10;0
+Extrator_Mapa_Controle_LUZ_SAP;0;0;0;0;0;1;10;0
+Extrator_Mapa_Custo_ATUAL;3;1;0;0;0;3;11;0
+Extrator_Mapa_Custo_BD;3;1;0;0;0;4;11;0
+Extrator_Mapa_Custo;4;2;0;0;0;5;11;0
+Extrator_Margem;7;6;0;0;0;1;10;0
+Extrator_MarketShare;0;0;2;0;3;1;13;0
+Extrator_MCD_FUNCIONARIO;2;4;0;0;0;1;11;0
+Extrator_MCD_GERAL;829;260;0;0;0;442;264;0
+Extrator_MCD_PDV;281;280;0;0;0;1;81;0
+Extrator_MCD_Recolhimento;102;51;0;0;0;1;111;0
+Extrator_MCD;72;36;0;28;1;1;64;0
+Extrator_Media_Pagamento;6;5;0;0;0;2;11;0
+Extrator_Medicamentos_Especiais_Dia_Anterior;4;0;0;0;0;3;17;0
+Extrator_Meta_Dia;13;10;0;0;6;7;13;0
+Extrator_Metas_Grupo;1;3;2;0;7;7;12;1
+Extrator_Monitor_NF;181;180;0;0;0;1;12;0
+Extrator_Monitor_Processo_PS;8;2;6;1;2;2;10;0
+Extrator_Monitor_Processos_People_Atual;22;8;44;2;49;33;29;2
+Extrator_Monitor_Processos_People;106;40;220;10;245;161;89;2
+Extrator_MSAF_Notas;0;0;0;0;0;1;10;0
+Extrator_MVA_LAKE;2;1;0;0;0;2;10;0
+Extrator_OMS - Atual;1;1;0;0;0;1;10;1
+Extrator_OMS;15;15;0;0;0;1;10;1
+Extrator_OSA;19;20;106;1;196;30;16;14
+Extrator_OTIF_V2;8;6;52;0;46;109;162;6
+Extrator_OTIF;8;4;36;0;34;69;76;4
+Extrator_Parametro_ABC;2;0;0;0;0;1;10;0
+Extrator_Parametro_De_Compra_New;28;17;24;0;3;16;13;0
+Extrator_Pedido_Aberto;62;2;34;0;0;1;11;0
+Extrator_Pedido_Emergencia;16;0;0;0;0;1;11;0
+Extrator_Pedidos_e_Recebimentos;44;14;10;0;24;109;159;3
+Extrator_Pedidos_Original;0;4;4;0;4;9;14;1
+Extrator_Performance_Vendas_Varejo_20251231;5;1;24;20;27;30;17;0
+Extrator_Performance_Vendas_Varejo;5;2;24;20;29;19;17;0
+Extrator_PFP;8;6;0;0;0;1;14;0
+Extrator_Physical_Inv_Atual;9;5;12;0;10;3;11;0
+Extrator_Physical_Inv;9;5;16;0;12;3;11;0
+Extrator_PLAN_COMPRAS;9;5;4;0;1;2;36;0
+Extrator_Planejamento_Demanda;1677;2;8;0;8;2;3367;0
+Extrator_PMC;5;2;2;0;2;5;12;0
+Extrator_Prev_Compras_CDS;1;0;0;0;0;3;20;0
+Extrator_Prev_Saidas_CDs;59;10;113;0;26;46;11;2
+Extrator_Prevencao_Perda_v3;0;20;6;0;25;776;10;2
+Extrator_Processos_People_ATUAL;17;8;8;1;15;18;21;0
+Extrator_Produtividade_Osasco;3;4;0;0;0;1;10;1
+Extrator_Profmetrics_Ofertas_FTP;1;1;0;0;1;1;16;1
+Extrator_Promo_Apps;4;1;0;0;0;1;11;0
+Extrator_Rateio_PUB;1;1;12;0;13;3;10;1
+Extrator_Rdm_Peoplesoft;2;2;0;0;0;1;11;0
+Extrator_Recebimento_EU_ATUAL;2;1;0;0;0;1;12;1
+Extrator_Recebimento_EU_Gustvo;121;120;0;0;0;1;250;1
+Extrator_Recebimento_EU;6;5;0;0;0;1;20;1
+Extrator_Recebimento_Trocas;33;0;6;0;3;15;13;0
+Extrator_Regime_ST;2;1;0;0;0;1;10;0
+Extrator_Relatorio_Faltas;12;1;0;0;0;1;10;0
+Extrator_Requisicao_Compras;15;0;0;0;0;16;11;0
+Extrator_Requisicao;148;21;42;0;0;1;11;0
+Extrator_Res_Auto;4;2;0;0;2;1;11;0
+Extrator_Ressuprimento_suporte;8479;1212;4844;0;2422;2423;11;0
+Extrator_Ressuprimento;6218;889;3552;0;1776;1777;11;0
+Extrator_Retire_na_Loja;2;1;2;0;0;1;12;0
+Extrator_RH_Lake;1;1;0;0;0;1;10;0
+Extrator_Ruptura_Loja - Copy;44;5;103;0;20;35;13;2
+Extrator_Ruptura_Loja_GERACAO;52;4;115;0;24;45;12;4
+Extrator_Ruptura_Loja_todos_motivos;45;6;103;0;20;34;12;2
+Extrator_Ruptura_Loja;52;4;115;0;24;46;12;4
+Extrator_Sales_Force_Mes_Anterior;0;0;0;0;0;1;10;0
+Extrator_Sales_Force;0;0;0;0;0;1;10;0
+Extrator_Sob_Falta;5;4;0;0;0;9;11;0
+Extrator_Sortimento;21;14;26;0;38;14;19;0
+Extrator_Super_Fornecedores;854;23;38;0;24;8599;4454;6
+Extrator_Tab_Prod;2;1;0;0;0;2;10;0
+Extrator_Ticket_Medio - Dia Anterior;6;6;0;0;3;1;12;0
+Extrator_Ticket_Medio - ME;27;3;0;0;1;1;12;0
+Extrator_Ticket_Medio;45;84;0;0;81;23;15;3
+Extrator_Transaction_Inv - Reprocessa;173;17;40;0;155;1;32;0
+Extrator_Transaction_Inv_ATUAL;2;1;0;1;0;1;11;0
+Extrator_Transaction_Inv;38;3;6;0;34;1;15;0
+Extrator_Transito_Atual;2;1;0;0;2;1;10;0
+Extrator_Transito;3;2;0;0;1;1;10;0
+Extrator_Uso_Consumo;21;20;2;0;1;21;11;1
+Extrator_VENDA_SEMANAL - Copy;2072;2071;0;0;0;2;11;0
+Extrator_VENDA_SEMANAL;2100;2099;0;0;0;2;11;0
+Extrator_Voucher;24;5;4;0;4;3;26;0
+Extrator_vTex_Acomp_Pedidos_GCP_US;0;0;0;0;0;1;10;0
+Extrator_vTex_GCP Atual;2;2;0;0;0;2;10;1
+Extrator_vTex_GCP;32;32;0;0;1;16;10;1
+Extrator_XML;2;3;0;0;0;3;10;0
+Extrator_Zona_Preco;2;1;0;0;0;1;10;0
+Extrator;10;1;9;0;0;1;10;1
+Falteiro;3408;0;362;0;30;3284;473;0
+Flash_de_Vendas - New;7;1;2;0;2;11;11;0
+Flash_de_Vendas_24;7;0;2;1;2;12;12;0
+Flash_de_Vendas;7;1;2;0;2;11;11;0
+Gera_Dim_Negocio;5;5;6;0;0;651;57;0
+Governance Dashboard;838;90;114;1798;244;10659;6678;1
+Grupo Operacao Fiscal;13;1;6;0;2;7;12;0
+Indicador Fornecedor;3;0;0;2;4;8;391;1
+Integracao_Visibilidade_Neogrid;0;0;0;0;0;1;10;0
+Intergacao_Promocoes_RDF - Copy;0;2;0;0;2;55;11;0
+Intergacao_Promocoes_RDF;0;2;0;0;2;55;11;0
+Inventario Ciclico_V2;2324;0;0;0;2;7136;11;1
+Inventario Ciclico;2698;0;0;0;2;2704;11;1
+Inventario_CD_906 - RJ;7;0;2;0;8;32;11;0
+Inventario_CD_908 - ES;7;0;2;0;8;33;11;0
+Inventario_CD_909 - MG;7;0;2;0;8;32;11;0
+Inventario_CD_910 - SP;7;0;2;0;8;50;11;0
+Inventario_CD_915 - BA;7;0;2;0;8;32;11;0
+Inventario_CD_917 - GO;7;0;2;0;8;32;11;0
+IVE_Ped_Emergencia;163;1;17;0;17;56;24;0
+License_Analyser_K3FDS_v2;0;14;30;0;15;55;10;0
+Logistica;63;14;46;0;46;13;33;2
+Mapa de Compras;76;9;172;20;78;69;115;1
+Mape Previsão de Demanda_Mês;1;0;2;0;5;2;10;1
+Mape Previsão de Demanda_Reprocessamento;12;6;26;1;8;25;18;1
+Mape Previsão de Demanda;1;0;0;0;3;2;10;1
+Marcas_Proprias;60;1;14;0;16;90;15;1
+MARGEM BRUTA Analytics;1;0;2;0;5;104;25;1
+MARGEM BRUTA;1;0;4;0;3;127;11;1
+MCD_Diario;0;0;0;0;0;1;13;0
+MCD_Hora;0;0;0;0;0;1;10;0
+Mediana_30D_DH;0;4;34;0;3314;4317;12;1
+Mediana_30D;6889;6;3036;6888;3393;24151;12;3
+Monitor Custo_CD;7;1;6;0;3;7;11;0
+Monitor Custo;9;1;8;0;3;8;11;0
+Monitor_Processo_People_OLD;4355;0;2;0;2;2544;6189;0
+Monitor_Processo_People;2531;0;2;0;2;2544;2541;0
+Orcado x Real;3;2;12;0;105;713;18;1
+Pedidos teste;0;0;0;0;0;2;13;0
+Pedidos;21;0;0;0;2;4;118;1
+Presença do Sortimento;9;3;36;0;9;36;19;0
+PREVENCAO_PERDAS;99;15;21;0;12;60;24;0
+Previsao Saida CD;30;1;12;0;8;16;13;1
+QUEBRANDO_CUSTO_AJUSTE_TAMANHO;0;0;0;0;0;1;10;0
+RECALCULO_v2;4330;2164;2163;0;0;2;12;0
+Rentabilidade por SKU - Preço Custo;9;0;20;0;4;11;45;0
+Rentabilidade por SKU;64;1;94;0;29;19;61;1
+Ruptura Loja_POCAI;2;0;0;0;0;3;11;1
+Ruptura Loja;163;97;164;2;108;1304;36;2
+Ruptura_CD_Geracao;21;2;54;0;27;36;14;1
+Ruptura_CD;980;3;269;2;53;165;1772;4
+SaaS Readiness v2.0.4 - PRD6;2;0;0;0;0;10317;51520;0
+SaaS Readiness v2.0.4;2;0;7;4;23;3695;87;0
+Saldo_Trocas;183;2;308;233;182;676;32;0
+Simulador_de_Compras;9;0;12;0;2;1;21;0
+Sumarizador Conversão Cupons;2;4;0;0;15;1;12;1
+Sumarizador_Estoque_DRE;1;1;0;0;1;1;11;0
+Tabelão_OFICIAL;21;8;16;0;7;31;11;0
+Ticket;56;2;0;0;3;12;28;0
+TIR;236;6;626;0;3979;139;3191;3
+Transformador - Historico de Precos;0;0;0;0;0;1;10;0
+Transformador Base Profmetrics x Consolidada;94;10;44;0;29;1964;254;1
+Transformador Cluster Pop_v2;0;15;26;0;21;39;15;0
+TRANSFORMADOR CMV 3 E 12 MESES;0;2;4;0;5;2;13;1
+Transformador Painel Diário - Comercial;0;2;6;0;20;35;10;0
+Transformador_App_Meu_Viva_Saude;10;70;40;0;110;51;99;0
+Transformador_Consolidacao_Meta;19;2;4;0;11;5;12;2
+Transformador_ConsolidacaoCD_DimVenda;9;1;4;0;3;11;13;0
+Transformador_ConsolidacaoN2_DimVenda;103;51;196;392;504;2328;15;3
+Transformador_ConsolidacaoN2_Ruptura_loja;106;3;8;200;24;36;14;3
+Transformador_Farmacia_Popular_Dia;4;2;4;0;2;1;11;0
+Transformador_Mapa_Compras;0;1;0;0;0;3;10;0
+Transformador_Margem_Diaria_teste;1;1;0;0;0;1;12;0
+Transformador_Margem_Diaria;4;13;16;1;20;12;11;1
+Transformador_MarketShare;1;1;0;0;4;35;12;1
+Transformador_MCD_Diario - Copy;1;218;60;0;219;126;652;0
+Transformador_MCD_Diario;0;220;74;0;226;125;1084;0
+Transformador_MCD_Hora;1;7;8;0;6;47;19;0
+Transformador_MEDIAVENDA_Ruptura_Geracao;93;2;4;0;4;1;11;1
+Transformador_MEDIAVENDA_Ruptura;93;2;4;0;4;1;11;1
+Transformador_Retire_na_Loja;0;1;4;0;3;1;14;0
+TRANSFORMADOR_RUPTURA_CD_PARA_LOJA;1;2;2;0;7;8;12;0
+Transformador_Ruptura_Loja - Top Fornecedor;0;1;4;0;5;5;18;0
+Transformador_Vtex_SelfEcomm_Contratos;0;0;0;0;0;1;10;0
+Transformador_Vtex_SelfEcomm;0;0;0;0;0;1;10;0
+Transformador_Wape_Torre_Indicadores;7;2;4;0;5;376;14;1
+Transformador_XLS_Consolidada;16;15;48;0;44;553;304;0
+Valida xls consolidada;0;0;0;0;0;3;14;0
+Validacao_envia_email_carga;0;0;0;0;0;6;10;0
+Valor do Estoque_DPSP;117;5;206;4;33;294;55;2
+Venda - Delivery Ecommerce;84;0;0;0;1;8;13;1
+Venda Acionistas;6;1;14;0;14;35;6;1
+Venda por Categoria_30;92;0;146;1;4;185;50;2
+Venda por Categoria_DPSP_DIA_v2;72;0;4;2;5;24;18;0
+Venda por Categoria_DPSP_v2 - Copy;38;0;6;14;6;73;18;1
+Venda por Categoria_DPSP_v2;40;0;6;16;6;81;18;1
+Venda por Categoria_DPSP;114;0;158;0;4;88;13;1
+Venda_Diaria_DPSP - Copy;135;0;0;0;0;1;10;0
+Venda_Diaria_DPSP_Meta;520;2;64;0;47;629;23;2
+Venda_Diaria_DPSP;5160;20;742;0;564;912;54;18
+Venda_Farmacia_Popular;27;2;4;0;3;39;14;2
+Venda_Hora_DPSP - Copy;17;0;0;0;1;8;10;1
+Venda_Hora_DPSP;68;2;0;0;1;8;14;2
