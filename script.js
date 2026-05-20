@@ -276,6 +276,37 @@ function showDetails(node) {
     }
 
     html += `</ul></div>`;
+
+    // Extract apps involved with this node
+    let appsInvolved = new Set();
+    relatedLinks.forEach(l => {
+        if (l.apps) {
+            l.apps.forEach(app => appsInvolved.add(app));
+        }
+    });
+
+    if (appsInvolved.size > 0) {
+        html += `<div class="relations"><h4>Aplicativos Envolvidos:</h4>`;
+        Array.from(appsInvolved).sort().forEach(appName => {
+            html += `<div style="margin-bottom: 10px; padding: 5px; background: rgba(255,255,255,0.05); border-radius: 4px;">`;
+            html += `<strong style="color: #64ffda;">${appName}</strong>`;
+            const stats = fullData.app_stats && fullData.app_stats[appName];
+            if (stats) {
+                html += `<ul class="stats-list" style="font-size: 0.85em; margin: 4px 0 0 0; padding-left: 15px; list-style-type: none; display: flex; flex-wrap: wrap; gap: 8px;">`;
+                for (const [key, value] of Object.entries(stats)) {
+                    if (value > 0 || value !== "0") { // Only show stats that are greater than 0 to save space
+                        html += `<li><span style="color: #aaa;">${key.replace('Qtd_', '')}:</span> <b style="color: #fff;">${value}</b></li>`;
+                    }
+                }
+                html += `</ul>`;
+            } else {
+                html += `<div style="font-size: 0.85em; margin-top: 4px; color: #888;">Sem métricas</div>`;
+            }
+            html += `</div>`;
+        });
+        html += `</div>`;
+    }
+
     detailsContent.innerHTML = html;
 }
 
