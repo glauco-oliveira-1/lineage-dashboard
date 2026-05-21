@@ -1,12 +1,31 @@
 :root {
-    --bg-color: #0f172a;
-    --sidebar-bg: rgba(30, 41, 59, 0.7);
-    --text-color: #f1f5f9;
+    --sidebar-width: 350px;
+    --bg-color: linear-gradient(135deg, #0f172a, #1e293b);
+    --glass-bg: rgba(0, 0, 0, 0.3);
+    --text-color: #e2e8f0;
     --accent-color: #38bdf8;
-    --border-color: #334155;
+    --border-color: rgba(255, 255, 255, 0.15);
     --node-source: #10b981;
     --node-target: #f43f5e;
-    --link-color: rgba(148, 163, 184, 0.3);
+    --link-color: rgba(148, 163, 184, 0.4);
+}
+    --bg-color: linear-gradient(135deg, #0f172a, #1e293b);
+    --glass-bg: rgba(0, 0, 0, 0.3);
+    --text-color: #e2e8f0;
+    --accent-color: #38bdf8;
+    --border-color: rgba(255, 255, 255, 0.15);
+    --node-source: #10b981;
+    --node-target: #f43f5e;
+    --link-color: rgba(148, 163, 184, 0.4);
+}
+    --bg-color: linear-gradient(135deg, #0f172a, #1e293b);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --text-color: #e2e8f0;
+    --accent-color: #38bdf8;
+    --border-color: rgba(255, 255, 255, 0.15);
+    --node-source: #10b981;
+    --node-target: #f43f5e;
+    --link-color: rgba(148, 163, 184, 0.4);
 }
 
 * {
@@ -17,27 +36,48 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: var(--bg-color);
+    background: var(--bg-color);
     color: var(--text-color);
     overflow: hidden;
     height: 100vh;
 }
 
 #app {
-    display: flex;
+    display: grid;
+    grid-template-columns: 350px 1fr;
     height: 100vh;
+    overflow: hidden;
 }
 
 #sidebar {
-    width: 350px;
-    background-color: var(--sidebar-bg);
-    backdrop-filter: blur(12px);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+#graph-container {
+    position: relative;
+    overflow: hidden;
+}
+
+#controls {
+    background: rgba(30, 41, 59, 0.7);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     z-index: 10;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.legend {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+    padding: 16px;
+    margin: 12px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
 }
 
 header h1 {
@@ -60,7 +100,7 @@ header p {
 
 .filter-group label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #94a3b8;
@@ -72,9 +112,9 @@ select, input {
     background-color: #1e293b;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     color: var(--text-color);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     outline: none;
     transition: border-color 0.2s;
 }
@@ -84,9 +124,10 @@ select:focus, input:focus {
 }
 
 #details {
-    margin-top: 32px;
-    flex-grow: 1;
-    border-top: 1px solid var(--border-color);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 16px;
     padding-top: 24px;
 }
 
@@ -123,8 +164,14 @@ svg:active {
     right: 24px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     align-items: flex-end;
+    background: var(--glass-bg);
+    padding: 12px;
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 #reset-zoom {
@@ -174,19 +221,62 @@ svg:active {
 /* Node and link styles for SVG */
 .node circle {
     stroke: #fff;
-    stroke-width: 1.5px;
+    stroke-width: 2px;
+    transition: stroke-width 0.2s, fill 0.2s;
 }
 
+.node.highlight circle {
+    stroke: var(--accent-color);
+    stroke-width: 4px;
+    fill-opacity: 1;
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+.explanation {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    position: absolute;
+    bottom: 20px;
+    left: calc(var(--sidebar-width) + 20px);
+    max-width: 300px;
+    z-index: 15;
+}
+
+
+.link.highlight {
+    stroke-width: 3px;
+    stroke: var(--accent-color);
+}
+
+.link.highlight-in {
+    stroke: #4caf50;
+    stroke-width: 3px;
+}
+
+.link.highlight-out {
+    stroke: #ff9800;
+    stroke-width: 3px;
+}
 .node text {
-    font-size: 10px;
-    fill: #94a3b8;
+    font-size: 12px;
+    fill: #ffffff;
     pointer-events: none;
+    font-weight: 500;
 }
 
 .link {
     fill: none;
     stroke: var(--link-color);
-    stroke-opacity: 0.6;
+    stroke-opacity: 0.8;
+    stroke-width: 1.5px;
     transition: stroke-opacity 0.3s, stroke 0.3s;
 }
 
@@ -196,8 +286,20 @@ svg:active {
     stroke-width: 2px;
 }
 
+.link.highlight-in {
+    stroke: #4caf50;
+    stroke-opacity: 1;
+    stroke-width: 2px;
+}
+
+.link.highlight-out {
+    stroke: #ff9800;
+    stroke-opacity: 1;
+    stroke-width: 2px;
+}
+
 .link.dimmed {
-    stroke-opacity: 0.05;
+    stroke-opacity: 0.2;
 }
 
 .node.highlight circle {
@@ -222,9 +324,8 @@ svg:active {
     opacity: 0 !important;
 }
 
-.macro-view .node text {
-    opacity: 0;
-}
+/* Keep node labels visible even at low zoom */
+/* Removed .macro-view rule that hides text */
 
 .error-box {
     background-color: rgba(244, 63, 94, 0.1);
@@ -262,14 +363,14 @@ svg:active {
 
 .detail-item strong {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: #94a3b8;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
 
 .detail-item .value {
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 500;
     color: #fff;
     word-break: break-all;

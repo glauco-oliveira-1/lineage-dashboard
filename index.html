@@ -9,11 +9,11 @@
 </head>
 <body>
     <div id="app">
-        <aside id="sidebar">
+        <aside id="sidebar" role="complementary">
             <header>
                 <h1>Lineage Graph</h1>
                 <p>Interactive file & table interactions</p>
-            </header>
+            <nav class="sidebar-nav">
             
             <section class="filters">
                 <div class="filter-group">
@@ -42,12 +42,16 @@
                     <p class="placeholder">Select a node to see details</p>
                 </div>
             </section>
+        <section class="explanation">
+            <h3>Como ler o grafo</h3>
+            <p>Setas verdes indicam conexões de entrada (dados que alimentam o nó selecionado). Setas laranja são saídas (dados produzidos pelo nó). Clique em um nó para destacar seus caminhos.</p>
+        </section>
         </aside>
 
         <main id="graph-container">
             <svg id="lineage-graph"></svg>
             <div id="controls">
-                <button id="reset-zoom">Reset Zoom</button>
+                <button id="reset-zoom" class="button">Reset Zoom</button>
                 <div class="legend">
                     <div class="legend-item"><span class="dot source"></span> Source / Input</div>
                     <div class="legend-item"><span class="dot target"></span> Target / Output</div>

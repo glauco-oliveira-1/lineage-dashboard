@@ -140,7 +140,8 @@ function render(nodes, links) {
     g.selectAll("*").remove();
 
     // Arrow markers
-    g.append("defs").append("marker")
+    const defs = g.append("defs");
+    defs.append("marker")
         .attr("id", "arrowhead")
         .attr("viewBox", "-0 -5 10 10")
         .attr("refX", 20)
@@ -152,6 +153,48 @@ function render(nodes, links) {
         .append("svg:path")
         .attr("d", "M 0,-5 L 10 ,0 L 0,5")
         .attr("fill", "#94a3b8")
+        .style("stroke", "none");
+
+    defs.append("marker")
+        .attr("id", "arrowhead-in")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 20)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("xoverflow", "visible")
+        .append("svg:path")
+        .attr("d", "M 0,-5 L 10 ,0 L 0,5")
+                .attr("fill", "#4caf50")
+        .style("stroke", "none");
+    // Outgoing arrow marker (orange)
+    defs.append("marker")
+        .attr("id", "arrowhead-out")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 20)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("xoverflow", "visible")
+        .append("svg:path")
+        .attr("d", "M 0,-5 L 10 ,0 L 0,5")
+        .attr("fill", "#ff9800")
+        .style("stroke", "none");
+
+    defs.append("marker")
+        .attr("id", "arrowhead-out")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 20)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("xoverflow", "visible")
+        .append("svg:path")
+        .attr("d", "M 0,-5 L 10 ,0 L 0,5")
+        .attr("fill", "#ff9800")
         .style("stroke", "none");
 
     simulation = d3.forceSimulation(nodes)
@@ -168,11 +211,27 @@ function render(nodes, links) {
 
     const link = g.append("g")
         .attr("class", "links")
-        .selectAll("line")
+        .selectAll("path")
         .data(links)
-        .enter().append("line")
+        .enter().append("path")
         .attr("class", "link")
         .attr("marker-end", "url(#arrowhead)");
+
+    // Compute parallel link offsets
+    const linkCounts = {};
+    links.forEach(l => {
+        const key = `${l.source.id}-${l.target.id}`;
+        linkCounts[key] = (linkCounts[key] || 0) + 1;
+    });
+    const linkOffsets = {};
+    links.forEach(l => {
+        const key = `${l.source.id}-${l.target.id}`;
+        const total = linkCounts[key];
+        const idx = linkOffsets[key] ? linkOffsets[key] + 1 : 0;
+        linkOffsets[key] = idx;
+        l._parallelIndex = idx;
+        l._parallelTotal = total;
+    });
 
     const node = g.append("g")
         .attr("class", "nodes")
@@ -199,11 +258,17 @@ function render(nodes, links) {
         });
 
     simulation.on("tick", () => {
-        link
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
+        link.attr("d", d => {
+            const x1 = d.source.x, y1 = d.source.y;
+            const x2 = d.target.x, y2 = d.target.y;
+            const dx = x2 - x1, dy = y2 - y1;
+            const dr = Math.sqrt(dx * dx + dy * dy);
+            // offset perpendicular to line for parallel links
+            const offset = (d._parallelTotal > 1) ? (d._parallelIndex - (d._parallelTotal - 1) / 2) * 10 : 0;
+            const mx = (x1 + x2) / 2 + -dy / dr * offset;
+            const my = (y1 + y2) / 2 + dx / dr * offset;
+            return `M${x1},${y1} Q${mx},${my} ${x2},${y2}`;
+        });
 
         node
             .attr("transform", d => `translate(${d.x},${d.y})`);
@@ -218,26 +283,74 @@ function showDetails(node) {
     const detailsContent = document.getElementById('details-content');
     
     // Highlight related
-    d3.selectAll(".link").classed("dimmed", true).classed("highlight", false);
+    d3.selectAll(".link")
+        .classed("dimmed", true)
+        .classed("highlight", false)
+        .classed("highlight-in", false)
+        .classed("highlight-out", false)
+        .attr("marker-end", "url(#arrowhead)");
+    
     d3.selectAll(".node").classed("dimmed", true).classed("highlight", false);
 
-    d3.selectAll(".link")
-        .filter(l => l.source.id === node.id || l.target.id === node.id)
-        .classed("highlight", true)
-        .classed("dimmed", false);
+    d3.selectAll(".link").each(function(l) {
+        if (l.target.id === node.id || l.target === node.id) {
+            d3.select(this)
+                .classed("highlight-in", true)
+                .classed("dimmed", false)
+                .attr("marker-end", "url(#arrowhead-in)");
+        } else if (l.source.id === node.id || l.source === node.id) {
+            d3.select(this)
+                .classed("highlight-out", true)
+                .classed("dimmed", false)
+                .attr("marker-end", "url(#arrowhead-out)");
+        }
+    });
 
-    const relatedLinks = fullData.links.filter(l => l.source === node.id || l.target === node.id);
+    // Gather all links involving this node (handle object or id forms)
+    const relatedLinks = fullData.links.filter(l =>
+        (typeof l.source === 'object' ? l.source.id : l.source) === node.id ||
+        (typeof l.target === 'object' ? l.target.id : l.target) === node.id);
     const neighbors = new Set([node.id]);
     relatedLinks.forEach(l => {
         neighbors.add(typeof l.source === 'object' ? l.source.id : l.source);
         neighbors.add(typeof l.target === 'object' ? l.target.id : l.target);
     });
 
+    // Highlight related links with direction-specific styles
+    d3.selectAll(".link")
+        .classed("dimmed", true)
+        .classed("highlight", false)
+        .classed("highlight-in", false)
+        .classed("highlight-out", false);
+
+    // Apply highlight based on direction
+    relatedLinks.forEach(l => {
+        const isOut = l.source.id === node.id || l.source === node.id;
+        d3.selectAll(".link")
+            .filter(d => d === l)
+            .classed(isOut ? "highlight-out" : "highlight-in", true)
+            .classed("dimmed", false)
+            .attr("marker-end", isOut ? "url(#arrowhead-out)" : "url(#arrowhead-in)");
+    });
+
     d3.selectAll(".node")
         .filter(n => neighbors.has(n.id))
         .classed("highlight", true)
         .classed("dimmed", false);
+
     
+    // Build details panel with inbound/outbound sections
+    const inbound = [];
+    const outbound = [];
+    relatedLinks.forEach(l => {
+        const isOut = (typeof l.source === 'object' ? l.source.id : l.source) === node.id;
+        if (isOut) {
+            outbound.push(l);
+        } else {
+            inbound.push(l);
+        }
+    });
+
     let html = `
         <div class="detail-item">
             <strong>Nome Lógico:</strong>
@@ -247,8 +360,23 @@ function showDetails(node) {
             <strong>Interações:</strong>
             <span class="value">${relatedLinks.length}</span>
         </div>
+        <div class="detail-item">
+            <strong>Origem (Incoming):</strong>
+            <ul class="path-list">${inbound.map(l => {
+                const srcId = typeof l.source === 'object' ? l.source.id : l.source;
+                return `<li>${srcId}</li>`;
+            }).join('')}</ul>
+        </div>
+        <div class="detail-item">
+            <strong>Destino (Outgoing):</strong>
+            <ul class="path-list">${outbound.map(l => {
+                const tgtId = typeof l.target === 'object' ? l.target.id : l.target;
+                return `<li>${tgtId}</li>`;
+            }).join('')}</ul>
+        </div>
     `;
 
+    // Preserve existing physical paths section unchanged
     if (node.physical_paths && node.physical_paths.length > 0) {
         html += `
             <div class="relations">
@@ -341,7 +469,12 @@ function clearDetails() {
     } else {
         document.getElementById('details-content').innerHTML = '<p class="placeholder">Select a node to see details</p>';
     }
-    d3.selectAll(".link").classed("highlight", false).classed("dimmed", false);
+    d3.selectAll(".link")
+        .classed("highlight", false)
+        .classed("highlight-in", false)
+        .classed("highlight-out", false)
+        .classed("dimmed", false)
+        .attr("marker-end", "url(#arrowhead)");
     d3.selectAll(".node").classed("highlight", false).classed("dimmed", false);
 }
 
